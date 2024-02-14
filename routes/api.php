@@ -2,6 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\LogoutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +17,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Route::post('/users/register', RegisterController::class)->name('register');
+Route::post('/users/login', LoginController::class)->name('login');
+Route::post('/users/logout', LogoutController::class)->name('logout');
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::apiResource('users', UserController::class);
 });
