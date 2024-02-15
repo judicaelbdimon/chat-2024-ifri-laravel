@@ -15,7 +15,11 @@ class ContactController extends Controller
      */
     public function index()
     {
-        //
+          //
+          $per_page = $request->per_page??15;
+          $contact=Contact::orderByDesc('created_at')
+                          ->paginate($per_page);
+          return $contact;
     }
 
     /**
@@ -36,7 +40,19 @@ class ContactController extends Controller
      */
     public function store(StoreContactRequest $request)
     {
-        //
+        //  $this->authorize('create',Contact::class);
+        $contactAccountData = Arr::only($request->all(), ['user1Id', 'user2Id', 'user1blocked', 'user2blocked','status']);
+        $contactAccountData['id'] = (string) Str::uuid();
+        foreach($contactAccountData as $key=>$value){
+            if($value==null) $contactAccountData[$key] = '';
+        }
+        $contactrAccount = User::create($contactAccountData);
+        if($contactAccount){
+            return $contactrAccount;
+        }
+        else return response()->json([
+            'message' => "Une erreur s'est produite"
+        ], 400);
     }
 
     /**
@@ -47,7 +63,10 @@ class ContactController extends Controller
      */
     public function show(Contact $contact)
     {
-        //
+         //
+         $contact=Contact::findOrFail($contact);
+
+         return new Contact($contact);
     }
 
     /**
@@ -70,7 +89,11 @@ class ContactController extends Controller
      */
     public function update(UpdateContactRequest $request, Contact $contact)
     {
-        //
+       //
+       $contactAccountData = Arr::only($request->all(),  ['user1Id', 'user2Id', 'user1blocked', 'user2blocked','status']);
+       $contact->update($contactData);
+
+       return ($contact);
     }
 
     /**
@@ -81,6 +104,22 @@ class ContactController extends Controller
      */
     public function destroy(Contact $contact)
     {
-        //
+        // $this->authorize('delete', Contact::class);
+        if($contact){
+            if ($contact->delete()) {
+                //return response()->noContent();
+                return response()->json([
+                    'message' => 'Resource deleted sucessfully.'
+                ], 200);
+            } else {
+                return response()->json([
+                    'message' => 'Failed deleting resource'
+                ], 400);
+            }
+        }else{
+            return response()->json([
+                'message' => 'Resource don\'t exist.'
+            ], 404);
+        }
     }
 }

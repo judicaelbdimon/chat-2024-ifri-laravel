@@ -10,4 +10,12 @@ class Discussion extends Model
     use HasFactory;
     public $incrementing = false;
     protected $keyType = 'string';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = ['name', 'description', 'createdBy', 'lastMessage','photoUrl','members'];
+
 }

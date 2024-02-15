@@ -13,9 +13,14 @@ class MessageController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //
+         //
+         $per_page = $request->per_page??15;
+         $message=Message::orderByDesc('created_at')
+                         ->paginate($per_page);
+         return $message;
     }
 
     /**
@@ -36,7 +41,19 @@ class MessageController extends Controller
      */
     public function store(StoreMessageRequest $request)
     {
-        //
+        //  $this->authorize('create', Survey::class);
+        $messageData = Arr::only($request->all(), ['text', 'surveyId', 'senderId', 'discussionId','responseToMsgId','description','file']);
+        $messageData['id'] = (string) Str::uuid();
+        foreach($messageData as $key=>$value){
+            if($value==null) $messageData[$key] = '';
+        }
+        $message = Message::create($messageData);
+        if($message){
+            return $message;
+        }
+        else return response()->json([
+            'message' => "Une erreur s'est produite"
+        ], 400);
     }
 
     /**
@@ -48,6 +65,9 @@ class MessageController extends Controller
     public function show(Message $message)
     {
         //
+        $message=Message::findOrFail($survey);
+
+        return new Message($message);
     }
 
     /**
@@ -70,7 +90,11 @@ class MessageController extends Controller
      */
     public function update(UpdateMessageRequest $request, Message $message)
     {
-        //
+         //
+         $messageData = Arr::only($request->all(), ['text', 'surveyId', 'senderId', 'discussionId','responseToMsgId','description','file']);
+         $message->update($messageData);
+
+         return ($message);
     }
 
     /**
@@ -81,6 +105,22 @@ class MessageController extends Controller
      */
     public function destroy(Message $message)
     {
-        //
+         // $this->authorize('delete', Message::class);
+         if($message){
+            if ($message->delete()) {
+                //return response()->noContent();
+                return response()->json([
+                    'message' => 'Resource deleted sucessfully.'
+                ], 200);
+            } else {
+                return response()->json([
+                    'message' => 'Failed deleting resource'
+                ], 400);
+            }
+        }else{
+            return response()->json([
+                'message' => 'Resource don\'t exist.'
+            ], 404);
+        }
     }
 }
