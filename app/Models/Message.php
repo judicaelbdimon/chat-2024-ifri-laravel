@@ -10,4 +10,12 @@ class Message extends Model
     use HasFactory;
     public $incrementing = false;
     protected $keyType = 'string';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = ['text', 'surveyId', 'senderId', 'discussionId','responseToMsgId','description','file'];
+
 }
