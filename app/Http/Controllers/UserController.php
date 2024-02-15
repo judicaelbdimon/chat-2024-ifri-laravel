@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -18,11 +19,12 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //
+        $per_page = $request->per_page??15;
         $users=User::orderByDesc('created_at')
-                        ->paginate(15);
+                        ->paginate($per_page);
         return $users;
     }
 
@@ -68,6 +70,9 @@ class UserController extends Controller
     public function show(User $user)
     {
         //
+        $user=User::findOrFail($user);
+
+        return new User($user);
     }
 
     /**
