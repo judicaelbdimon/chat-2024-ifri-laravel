@@ -13,7 +13,7 @@ class ContactController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
           //
           $per_page = $request->per_page??15;
